@@ -517,7 +517,7 @@ const SUPABASE_URL = "https://qfmklxxbjsxnupnpuffv.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbWtseHhianN4bnVwbnB1ZmZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4ODMxMzAsImV4cCI6MjA5OTQ1OTEzMH0.JW6i5P-fMFt0Du6BiwX5UnLL15mHYV--3Ox53Ca2LQ4";
 
 // Nécessite le SDK chargé via CDN dans chaque page :
-// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+// balise script pointant vers cdn.jsdelivr.net/npm/@supabase/supabase-js@2
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /** Nom des tables, centralisé pour éviter les fautes de frappe */
