@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — Social Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   SOCIAL HUB — Design System
+   Concept: one hub, three channels. The hub-and-spoke motif
+   (a center node feeding Facebook / Instagram / TikTok) is the
+   signature element, reused in the logomark, empty states and
+   the publishing-in-progress animation.
+   ========================================================= */
+
+:root{
+  /* --- Palette (light) --- */
+  --ink:            #0B1C33;   /* deep professional blue-black, primary text */
+  --blue-900:       #14264A;   /* sidebar / dark surfaces */
+  --blue-700:       #1B3A6B;   /* primary brand blue */
+  --blue-500:       #3D7DFF;   /* action blue — buttons, links, focus */
+  --blue-100:       #E7EEFF;   /* soft tint for badges / hovers */
+  --gray-50:        #F5F7FA;   /* app background */
+  --gray-100:       #EEF1F5;
+  --gray-200:       #E2E8F0;   /* borders */
+  --gray-400:       #94A3B8;   /* muted text */
+  --gray-600:       #5B6B82;
+  --white:          #FFFFFF;
+
+  --success:        #1E8E5A;
+  --success-bg:      #E5F6EE;
+  --warning:        #B7791F;
+  --warning-bg:     #FBF1DD;
+  --danger:         #C0362C;
+  --danger-bg:      #FBE9E7;
+
+  --facebook:       #1877F2;
+  --instagram:      #D6249F;
+  --tiktok:         #101010;
+
+  /* --- Type --- */
+  --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body:    'Inter', 'Segoe UI', sans-serif;
+  --font-mono:    'IBM Plex Mono', 'Consolas', monospace;
+
+  /* --- Layout --- */
+  --sidebar-w: 248px;
+  --topbar-h: 64px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-card: 0 1px 2px rgba(11,28,51,0.06), 0 8px 24px rgba(11,28,51,0.06);
+  --transition: 180ms cubic-bezier(.4,0,.2,1);
+
+  --bg: var(--gray-50);
+  --surface: var(--white);
+  --text: var(--ink);
+  --text-muted: var(--gray-600);
+  --border: var(--gray-200);
+}
+
+[data-theme="dark"]{
+  --ink:            #EAF0FF;
+  --bg:             #0B1523;
+  --surface:        #101C30;
+  --text:           #EAF0FF;
+  --text-muted:     #92A2BC;
+  --border:         #223349;
+  --gray-100:       #16233A;
+  --blue-100:       #182C52;
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+}
+
+*,*::before,*::after{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--transition), color var(--transition);
+}
+h1,h2,h3,h4,.font-display{ font-family: var(--font-display); letter-spacing: -0.01em; }
+a{ color: inherit; }
+button{ font-family: var(--font-body); }
+::selection{ background: var(--blue-100); }
+
+/* Visible keyboard focus everywhere */
+:focus-visible{
+  outline: 2px solid var(--blue-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* =========================================================
+   Hub logomark — used on auth pages, sidebar, empty states
+   ========================================================= */
+.hub-mark{ display:inline-flex; align-items:center; gap:10px; }
+.hub-mark svg{ width:32px; height:32px; display:block; }
+.hub-mark .hub-node{ fill: var(--blue-500); }
+.hub-mark .hub-spoke{ stroke: var(--blue-500); stroke-width:2; opacity:.55; }
+.hub-mark .hub-fb{ fill:var(--facebook); }
+.hub-mark .hub-ig{ fill:var(--instagram); }
+.hub-mark .hub-tt{ fill:var(--tiktok); }
+.hub-mark-word{ font-family: var(--font-display); font-weight:600; font-size:1.15rem; letter-spacing:-0.02em; }
+
+@keyframes pulse-spoke{
+  0%   { stroke-dashoffset: 24; opacity:.2; }
+  60%  { opacity:.9; }
+  100% { stroke-dashoffset: 0; opacity:.2; }
+}
+.hub-mark.animate .hub-spoke{
+  stroke-dasharray: 6 6;
+  animation: pulse-spoke 1.8s linear infinite;
+}
+
+/* =========================================================
+   Auth pages (login / signup)
+   ========================================================= */
+.auth-shell{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns: 1fr;
+  background: var(--bg);
+}
+@media(min-width: 960px){
+  .auth-shell{ grid-template-columns: 1.05fr 1fr; }
+}
+.auth-visual{
+  display:none;
+  background: linear-gradient(160deg, var(--blue-900), var(--blue-700));
+  color:#fff;
+  padding: 56px;
+  position:relative;
+  overflow:hidden;
+}
+@media(min-width: 960px){ .auth-visual{ display:flex; flex-direction:column; justify-content:space-between; } }
+.auth-visual h1{ font-size: 2.1rem; max-width: 420px; line-height:1.2; }
+.auth-visual p{ color: #C7D6FF; max-width: 380px; }
+.auth-visual .hub-mark-word{ color:#fff; }
+
+.auth-form-wrap{
+  display:flex; align-items:center; justify-content:center;
+  padding: 32px 24px;
+}
+.auth-card{ width:100%; max-width: 380px; }
+.auth-card .hub-mark{ margin-bottom: 28px; }
+.auth-card h2{ font-size:1.5rem; margin:0 0 6px; }
+.auth-card .sub{ color:var(--text-muted); margin:0 0 28px; font-size:.92rem; }
+
+.field{ margin-bottom: 16px; }
+.field label{ display:block; font-size:.82rem; font-weight:600; margin-bottom:6px; color:var(--text); }
+.field input, .field select, .field textarea{
+  width:100%; padding: 11px 13px; border-radius: var(--radius-sm);
+  border:1px solid var(--border); background: var(--surface); color:var(--text);
+  font-size:.94rem; transition: border-color var(--transition), box-shadow var(--transition);
+}
+.field input:focus, .field select:focus, .field textarea:focus{
+  border-color: var(--blue-500); box-shadow: 0 0 0 3px var(--blue-100);
+}
+.field .hint{ font-size:.78rem; color:var(--text-muted); margin-top:5px; }
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  border:none; border-radius: var(--radius-sm); cursor:pointer;
+  font-weight:600; font-size:.92rem; padding: 11px 18px;
+  transition: transform var(--transition), background var(--transition), box-shadow var(--transition);
+}
+.btn:active{ transform: translateY(1px); }
+.btn-primary{ background: var(--blue-500); color:#fff; }
+.btn-primary:hover{ background: #3070ea; }
+.btn-block{ width:100%; }
+.btn-ghost{ background:transparent; color:var(--text); border:1px solid var(--border); }
+.btn-ghost:hover{ background: var(--gray-100); }
+.btn-danger-outline{ background:transparent; color:var(--danger); border:1px solid var(--danger); }
+.btn-sm{ padding:7px 12px; font-size:.82rem; }
+
+.auth-error{
+  background: var(--danger-bg); color: var(--danger); border-radius: var(--radius-sm);
+  padding:10px 12px; font-size:.85rem; margin-bottom:16px; display:none;
+}
+.auth-switch{ margin-top:22px; font-size:.87rem; color:var(--text-muted); text-align:center; }
+.auth-switch a{ color:var(--blue-500); font-weight:600; text-decoration:none; }
+
+/* Landing (index) */
+.landing{
+  min-height:100vh; display:flex; flex-direction:column;
+  background: radial-gradient(1200px 600px at 80% -10%, var(--blue-100), transparent), var(--bg);
+}
+.landing-nav{ display:flex; align-items:center; justify-content:space-between; padding: 20px 40px; }
+.landing-hero{ flex:1; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding: 40px; max-width: 720px; }
+.landing-hero h1{ font-size: clamp(2.1rem, 4vw, 3.1rem); line-height:1.12; margin:0 0 18px; }
+.landing-hero p{ color: var(--text-muted); font-size:1.05rem; max-width:520px; margin:0 0 28px; }
+.landing-actions{ display:flex; gap:12px; }
+
+/* =========================================================
+   App shell (dashboard / publications / etc.)
+   ========================================================= */
+.app-shell{ display:flex; min-height:100vh; }
+
+.sidebar{
+  width: var(--sidebar-w); flex-shrink:0; background: var(--blue-900); color:#fff;
+  display:flex; flex-direction:column; padding: 20px 14px; position:sticky; top:0; height:100vh;
+}
+.sidebar .hub-mark-word{ color:#fff; }
+.sidebar-top{ padding: 6px 8px 22px; border-bottom:1px solid rgba(255,255,255,.08); margin-bottom:14px; }
+.nav-group-label{ font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:#7C8EB4; padding: 14px 12px 6px; }
+.nav-link{
+  display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius: var(--radius-sm);
+  color:#C7D3EC; text-decoration:none; font-size:.9rem; font-weight:500; margin-bottom:2px;
+  transition: background var(--transition), color var(--transition);
+}
+.nav-link svg{ width:18px; height:18px; flex-shrink:0; opacity:.9; }
+.nav-link:hover{ background: rgba(255,255,255,.06); color:#fff; }
+.nav-link.active{ background: var(--blue-500); color:#fff; }
+.sidebar-footer{ margin-top:auto; padding-top:14px; border-top:1px solid rgba(255,255,255,.08); }
+.org-pill{ display:flex; align-items:center; gap:10px; padding:8px; border-radius:var(--radius-sm); }
+.org-avatar{ width:32px; height:32px; border-radius:50%; background:var(--blue-500); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.8rem; }
+.org-meta{ line-height:1.2; }
+.org-meta .name{ font-size:.84rem; font-weight:600; color:#fff; }
+.org-meta .role{ font-size:.72rem; color:#8FA2C4; }
+
+.main{ flex:1; min-width:0; display:flex; flex-direction:column; }
+.topbar{
+  height: var(--topbar-h); display:flex; align-items:center; justify-content:space-between;
+  padding: 0 28px; border-bottom:1px solid var(--border); background: var(--surface);
+  position:sticky; top:0; z-index:5;
+}
+.topbar h1{ font-size:1.15rem; margin:0; }
+.topbar-actions{ display:flex; align-items:center; gap:12px; }
+.icon-btn{
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:var(--surface);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-muted);
+}
+.icon-btn:hover{ color:var(--text); background: var(--gray-100); }
+.icon-btn svg{ width:17px; height:17px; }
+
+.content{ padding: 28px; max-width: 1180px; width:100%; margin:0 auto; }
+
+.stat-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:16px; margin-bottom: 26px; }
+.stat-card{
+  background: var(--surface); border:1px solid var(--border); border-radius: var(--radius-md);
+  padding: 18px 20px; box-shadow: var(--shadow-card);
+}
+.stat-card .label{ font-size:.78rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+.stat-card .value{ font-family: var(--font-mono); font-size:1.9rem; font-weight:600; margin-top:8px; }
+.stat-card .delta{ font-size:.78rem; margin-top:6px; }
+.delta.up{ color: var(--success); }
+.delta.down{ color: var(--danger); }
+
+.card{
+  background: var(--surface); border:1px solid var(--border); border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card); padding: 20px 22px; margin-bottom:20px;
+}
+.card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.card-head h3{ font-size:1rem; margin:0; }
+
+.two-col{ display:grid; grid-template-columns: 1.4fr 1fr; gap:20px; }
+@media(max-width: 900px){ .two-col{ grid-template-columns: 1fr; } }
+
+.activity-item{ display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); font-size:.87rem; }
+.activity-item:last-child{ border-bottom:none; }
+.activity-dot{ width:8px; height:8px; border-radius:50%; background:var(--blue-500); margin-top:6px; flex-shrink:0; }
+.activity-time{ color:var(--text-muted); font-size:.78rem; }
+
+.platform-chip{
+  display:inline-flex; align-items:center; gap:6px; padding:4px 9px; border-radius:999px;
+  font-size:.74rem; font-weight:600; color:#fff;
+}
+.chip-facebook{ background: var(--facebook); }
+.chip-instagram{ background: linear-gradient(135deg,#F58529,#DD2A7B,#8134AF,#515BD4); }
+.chip-tiktok{ background: var(--tiktok); }
+
+.badge{ display:inline-flex; padding:3px 9px; border-radius:999px; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+.badge-draft{ background: var(--gray-100); color: var(--text-muted); }
+.badge-scheduled{ background: var(--warning-bg); color: var(--warning); }
+.badge-published{ background: var(--success-bg); color: var(--success); }
+.badge-failed{ background: var(--danger-bg); color: var(--danger); }
+
+/* Bar chart (dependency-free, drawn with divs) */
+.bar-chart{ display:flex; align-items:flex-end; gap:10px; height:160px; padding-top:10px; }
+.bar-chart .bar{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:6px; }
+.bar-chart .bar .fill{ width:100%; border-radius: 6px 6px 0 0; background: var(--blue-500); transition: height .6s ease; }
+.bar-chart .bar .lbl{ font-size:.7rem; color:var(--text-muted); }
+
+/* =========================================================
+   Publication composer
+   ========================================================= */
+.composer{ display:grid; grid-template-columns: 1.3fr 1fr; gap:20px; }
+@media(max-width: 980px){ .composer{ grid-template-columns: 1fr; } }
+
+.platform-toggle{ display:flex; gap:10px; flex-wrap:wrap; }
+.platform-check{
+  display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius: var(--radius-sm);
+  padding:9px 14px; cursor:pointer; font-size:.86rem; font-weight:600; background:var(--surface);
+  transition: border-color var(--transition), background var(--transition);
+}
+.platform-check input{ accent-color: var(--blue-500); }
+.platform-check.checked{ border-color: var(--blue-500); background: var(--blue-100); }
+
+.dropzone{
+  border:1.5px dashed var(--border); border-radius: var(--radius-md); padding: 26px;
+  text-align:center; color:var(--text-muted); font-size:.86rem; cursor:pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.dropzone:hover, .dropzone.drag{ border-color: var(--blue-500); background: var(--blue-100); }
+.media-thumbs{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+.media-thumb{ position:relative; width:84px; height:84px; border-radius: var(--radius-sm); overflow:hidden; border:1px solid var(--border); }
+.media-thumb img, .media-thumb video{ width:100%; height:100%; object-fit:cover; }
+.media-thumb .rm{
+  position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%;
+  background:rgba(11,28,51,.75); color:#fff; border:none; cursor:pointer; font-size:.7rem;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.preview-phone{
+  border:1px solid var(--border); border-radius: var(--radius-lg); padding:16px; background: var(--surface);
+}
+.preview-phone .ph-head{ display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.preview-phone .ph-avatar{ width:30px; height:30px; border-radius:50%; background: var(--blue-500); }
+.preview-phone .ph-name{ font-size:.83rem; font-weight:700; }
+.preview-phone .ph-body{ font-size:.85rem; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+.preview-phone .ph-media{ margin-top:10px; border-radius: var(--radius-sm); overflow:hidden; background: var(--gray-100); min-height:140px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:.78rem; }
+.preview-phone .ph-media img, .preview-phone .ph-media video{ width:100%; display:block; }
+.preview-phone .ph-hashtags{ margin-top:8px; font-size:.8rem; color: var(--blue-500); }
+
+.composer-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:18px; }
+
+.empty-state{ text-align:center; padding: 46px 20px; color:var(--text-muted); }
+.empty-state .hub-mark{ justify-content:center; margin-bottom:14px; opacity:.7; }
+
+.toast{
+  position:fixed; bottom:24px; right:24px; background: var(--ink); color:#fff; padding:12px 18px;
+  border-radius: var(--radius-sm); font-size:.87rem; box-shadow: var(--shadow-card);
+  opacity:0; transform: translateY(10px); transition: all var(--transition); z-index:50;
+}
+.toast.show{ opacity:1; transform:none; }
+.toast.error{ background: var(--danger); }
+.toast.success{ background: var(--success); }
+
+.table{ width:100%; border-collapse:collapse; font-size:.87rem; }
+.table th{ text-align:left; color:var(--text-muted); font-weight:600; font-size:.76rem; text-transform:uppercase; letter-spacing:.04em; padding:8px 10px; border-bottom:1px solid var(--border); }
+.table td{ padding:12px 10px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.table tr:last-child td{ border-bottom:none; }
+
+@media(max-width: 780px){
+  .sidebar{ position:fixed; left:-260px; z-index:20; transition: left var(--transition); }
+  .sidebar.open{ left:0; }
+  .content{ padding:18px; }
+}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-visual">
+    <div class="hub-mark animate">
+      <svg viewBox="0 0 32 32"><circle class="hub-node" cx="16" cy="16" r="4.5"/>
+        <line class="hub-spoke" x1="16" y1="16" x2="6" y2="7"/>
+        <line class="hub-spoke" x1="16" y1="16" x2="26" y2="7"/>
+        <line class="hub-spoke" x1="16" y1="16" x2="16" y2="27"/>
+        <circle class="hub-fb" cx="6" cy="7" r="3.4"/>
+        <circle class="hub-ig" cx="26" cy="7" r="3.4"/>
+        <circle class="hub-tt" cx="16" cy="27" r="3.4"/>
+      </svg>
+      <span class="hub-mark-word">Social Hub</span>
+    </div>
+    <div>
+      <h1>Trois réseaux. Un seul rythme de publication.</h1>
+      <p>Créez, programmez et suivez vos publications Facebook, Instagram et TikTok depuis une interface pensée pour les équipes marketing.</p>
+    </div>
+    <p style="font-size:.8rem; color:#8FA2C4;">© Social Hub — plateforme de gestion des réseaux sociaux</p>
+  </div>
+
+  <div class="auth-form-wrap">
+    <div class="auth-card">
+      <div class="hub-mark">
+        <svg viewBox="0 0 32 32"><circle class="hub-node" cx="16" cy="16" r="4.5"/>
+          <line class="hub-spoke" x1="16" y1="16" x2="6" y2="7"/>
+          <line class="hub-spoke" x1="16" y1="16" x2="26" y2="7"/>
+          <line class="hub-spoke" x1="16" y1="16" x2="16" y2="27"/>
+          <circle class="hub-fb" cx="6" cy="7" r="3.4"/>
+          <circle class="hub-ig" cx="26" cy="7" r="3.4"/>
+          <circle class="hub-tt" cx="16" cy="27" r="3.4"/>
+        </svg>
+        <span class="hub-mark-word">Social Hub</span>
+      </div>
+
+      <!-- Formulaire de connexion -->
+      <div id="login-view">
+        <h2>Connexion</h2>
+        <p class="sub">Accédez à votre tableau de bord.</p>
+        <div class="auth-error" data-error="login"></div>
+        <form id="login-form">
+          <div class="field">
+            <label for="login-email">Adresse e-mail</label>
+            <input type="email" id="login-email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="login-password">Mot de passe</label>
+            <input type="password" id="login-password" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+        </form>
+        <p class="auth-switch">Pas encore de compte ? <a href="#" data-switch="signup">Créer un compte</a></p>
+      </div>
+
+      <!-- Formulaire d'inscription -->
+      <div id="signup-view" style="display:none;">
+        <h2>Créer un compte</h2>
+        <p class="sub">Configurez votre organisation en quelques secondes.</p>
+        <div class="auth-error" data-error="signup"></div>
+        <form id="signup-form">
+          <div class="field">
+            <label for="signup-org">Nom de l'organisation</label>
+            <input type="text" id="signup-org" required>
+          </div>
+          <div class="field">
+            <label for="signup-nom">Votre nom</label>
+            <input type="text" id="signup-nom" required>
+          </div>
+          <div class="field">
+            <label for="signup-email">Adresse e-mail</label>
+            <input type="email" id="signup-email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="signup-password">Mot de passe</label>
+            <input type="password" id="signup-password" required minlength="6" autocomplete="new-password">
+            <div class="hint">6 caractères minimum.</div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Créer mon compte</button>
+        </form>
+        <p class="auth-switch">Déjà inscrit ? <a href="#" data-switch="login">Se connecter</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const loginView = document.getElementById("login-view");
+  const signupView = document.getElementById("signup-view");
+
+  function showView(mode) {
+    loginView.style.display = mode === "login" ? "block" : "none";
+    signupView.style.display = mode === "signup" ? "block" : "none";
+  }
+  document.querySelectorAll("[data-switch]").forEach(a => {
+    a.addEventListener("click", e => { e.preventDefault(); showView(a.dataset.switch); });
+  });
+  const initialMode = new URLSearchParams(location.search).get("mode") === "signup" ? "signup" : "login";
+  showView(initialMode);
+
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errorBox = document.querySelector('[data-error="login"]');
+    errorBox.style.display = "none";
+    try {
+      await signIn({
+        email: document.getElementById("login-email").value.trim(),
+        password: document.getElementById("login-password").value,
+      });
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      errorBox.textContent = "Connexion impossible : e-mail ou mot de passe incorrect.";
+      errorBox.style.display = "block";
+    }
+  });
+
+  document.getElementById("signup-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errorBox = document.querySelector('[data-error="signup"]');
+    errorBox.style.display = "none";
+    try {
+      const result = await signUp({
+        organisationNom: document.getElementById("signup-org").value.trim(),
+        nom: document.getElementById("signup-nom").value.trim(),
+        email: document.getElementById("signup-email").value.trim(),
+        password: document.getElementById("signup-password").value,
+      });
+      if (result.pendingConfirmation) {
+        errorBox.style.display = "block";
+        errorBox.style.background = "var(--success-bg)";
+        errorBox.style.color = "var(--success)";
+        errorBox.textContent = "Compte créé. Vérifiez votre boîte e-mail pour confirmer votre adresse avant de vous connecter.";
+        return;
+      }
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      errorBox.textContent = "Inscription impossible : " + err.message;
+      errorBox.style.display = "block";
+    }
+  });
+</script>
+<script>
+/**
+ * SOCIAL HUB — Client Supabase
+ * -----------------------------------------------------------------------
+ * SEUULE la clé "anon" (publique) est utilisée ici. Elle est protégée par
+ * les policies Row Level Security définies dans supabase/database.sql.
+ * AUCUNE clé secrète (service_role, tokens API Facebook/Instagram/TikTok)
+ * ne doit jamais apparaître dans ce fichier ni dans aucun fichier frontend.
+ * Ces clés vivent uniquement côté serveur, dans les Edge Functions.
+ * -----------------------------------------------------------------------
+ */
+
+// URL et clé anon de votre projet Supabase (Project Settings > API).
+// La clé "anon" est publique par design et protégée par les policies RLS.
+const SUPABASE_URL = "https://qfmklxxbjsxnupnpuffv.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbWtseHhianN4bnVwbnB1ZmZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4ODMxMzAsImV4cCI6MjA5OTQ1OTEzMH0.JW6i5P-fMFt0Du6BiwX5UnLL15mHYV--3Ox53Ca2LQ4";
+
+// Nécessite le SDK chargé via CDN dans chaque page :
+// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/** Nom des tables, centralisé pour éviter les fautes de frappe */
+const TABLES = {
+  users: "users",
+  organizations: "organizations",
+  socialAccounts: "social_accounts",
+  posts: "posts",
+  mediaLibrary: "media_library",
+  analytics: "analytics",
+};
+
+/** Nom du bucket de stockage Supabase Storage pour les médias */
+const MEDIA_BUCKET = "media";
+
+/** Raccourci pour afficher un toast de notification (voir style.css .toast) */
+function showToast(message, type = "info") {
+  let toast = document.querySelector(".toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.className = "toast";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.className = `toast show ${type === "error" ? "error" : type === "success" ? "success" : ""}`;
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove("show"), 3200);
+}
+
+/** Applique le thème clair/sombre choisi et le persiste en session */
+function applyStoredTheme() {
+  const theme = sessionStorage.getItem("sh_theme") || "light";
+  document.documentElement.setAttribute("data-theme", theme);
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") || "light";
+  const next = current === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", next);
+  sessionStorage.setItem("sh_theme", next);
+}
+applyStoredTheme();
+
+</script>
+<script>
+/**
+ * SOCIAL HUB — Authentification
+ * Gère : inscription, connexion, déconnexion, protection des pages privées,
+ * et récupération du profil (rôle + organisation) de l'utilisateur connecté.
+ */
+
+const PUBLIC_PAGES = ["index.html", "login.html", ""];
+
+/** Redirige vers login.html si aucune session active. À appeler en haut de chaque page privée. */
+async function requireAuth() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
+    window.location.href = "login.html";
+    return null;
+  }
+  return session;
+}
+
+/** Récupère le profil applicatif (table users) lié à l'utilisateur Supabase Auth connecté */
+async function getCurrentProfile() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return null;
+  const { data, error } = await supabaseClient
+    .from(TABLES.users)
+    .select("id, nom, email, role, organisation_id, organizations(nom)")
+    .eq("id", user.id)
+    .single();
+  if (error) {
+    console.error("Erreur chargement profil:", error.message);
+    return null;
+  }
+  return data;
+}
+
+/** Inscription : crée le compte Auth + la ligne applicative dans `users` (+ organisation si première inscription) */
+async function signUp({ nom, email, password, organisationNom }) {
+  const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+    email,
+    password,
+  });
+  if (signUpError) throw signUpError;
+
+  const userId = signUpData.user?.id;
+  // Si aucune session active n'est renvoyée, la confirmation par e-mail est
+  // exigée : on ne peut pas encore insérer de lignes authentifiées (RLS).
+  if (!userId || !signUpData.session) {
+    return { pendingConfirmation: true };
+  }
+
+  // Crée l'organisation (le premier utilisateur devient Administrateur entreprise)
+  const { data: org, error: orgError } = await supabaseClient
+    .from(TABLES.organizations)
+    .insert({ nom: organisationNom, abonnement: "essai" })
+    .select()
+    .single();
+  if (orgError) throw orgError;
+
+  const { error: userRowError } = await supabaseClient.from(TABLES.users).insert({
+    id: userId,
+    nom,
+    email,
+    role: "administrateur_entreprise",
+    organisation_id: org.id,
+  });
+  if (userRowError) throw userRowError;
+
+  return { pendingConfirmation: false };
+}
+
+/** Connexion par e-mail + mot de passe */
+async function signIn({ email, password }) {
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data;
+}
+
+/** Déconnexion puis retour à la page de connexion */
+async function signOutAndRedirect() {
+  await supabaseClient.auth.signOut();
+  window.location.href = "login.html";
+}
+
+/** Table de permissions par rôle — utilisée pour afficher/masquer des actions dans l'UI */
+const PERMISSIONS = {
+  super_administrateur: ["*"],
+  administrateur_entreprise: [
+    "posts.create", "posts.publish", "posts.delete",
+    "media.upload", "media.delete",
+    "accounts.manage", "users.manage", "settings.manage",
+  ],
+  community_manager: [
+    "posts.create", "posts.publish",
+    "media.upload",
+  ],
+  lecteur: ["posts.view", "media.view", "stats.view"],
+};
+
+function hasPermission(role, permission) {
+  const perms = PERMISSIONS[role] || [];
+  return perms.includes("*") || perms.includes(permission);
+}
+
+</script>
+</body>
+</html>
