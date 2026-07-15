@@ -586,7 +586,7 @@ function hasPermission(role, permission) {
  * côté frontend — contrairement à l'App Secret qui reste dans l'Edge Function).
  */
 const META_APP_ID = "VOTRE_META_APP_ID";
-const FUNCTIONS_BASE = SUPABASE_URL.replace(".supabase.co", ".functions.supabase.co");
+const FUNCTIONS_BASE = `${SUPABASE_URL}/functions/v1`;
 // Si votre projet utilise l'URL classique https://xxx.supabase.co/functions/v1/..., utilisez plutôt :
 // const FUNCTIONS_BASE = `${SUPABASE_URL}/functions/v1`;
 
@@ -683,8 +683,8 @@ async function startFacebookConnect() {
       .select()
       .single();
     if (error) throw error;
-
-    const redirectUri = `${FUNCTIONS_BASE}/facebook-oauth-callback`;
+const redirectUri = `${SUPABASE_URL}/functions/v1/facebook-oauth-callback`;
+  
     const scope = ["pages_show_list", "pages_manage_posts", "pages_read_engagement"].join(",");
 
     const authUrl = "https://www.facebook.com/v19.0/dialog/oauth?" + new URLSearchParams({
